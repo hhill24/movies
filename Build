@@ -1,5 +1,3 @@
-cd movies
-
 echo stoping services
 docker stop restheart
 docker stop mongodb
