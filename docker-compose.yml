@@ -1,0 +1,71 @@
+version: '3.3'
+services:
+
+    # videoserv:
+    #   image: video
+    #   container_name: videoserv
+    #   build: ./Nginx
+    #   ports:
+    #     - 80:80
+    #   volumes:
+    #     - $PWD/Nginx/mp4:/var/mp4
+    #     - $PWD/Nginx/www:/var/www
+    #   command:
+    #     - /usr/local/nginx-streaming/sbin/nginx
+
+    # some-mysql:
+    #   ports:
+    #       - 3306:3306
+    #   build: ./Flask
+    #   container_name: some-mysql
+    #   environment:
+    #       - MYSQL_ROOT_PASSWORD=dacjd156n.
+    #   image: mysql:8.0
+
+    # myflix:
+    #   image: myflix
+    #   container_name: myflix
+    #   build: ./Flask
+    #   volumes:
+    #     - /Users/hopehill/Documents/FourthYear/DevOps/MyFlix/Flask:/home
+    #   ports:
+    #     - 5000:5000
+    #   links: 
+    #       - some-mysql
+
+# docker build -t myflix .
+# docker tag myflix hopehill24/myflix
+# docker push hopehill24/myflix
+
+# docker pull hopehill24/myflix
+# docker run -p 5000:5000 -v --name myflix -d hopehill24/myflix
+
+
+    mongodb:
+      image: mongo:latest
+      container_name: mongodb
+      volumes: 
+        - $PWD/data:/data/db
+        - $PWD/import:/home
+
+# docker run -d --name mongodb -v “$PWD/data:/data/db“ -v “$PWD/import:/home” mongo:latest
+# git clone https://github.com/hhill24/movies
+# docker exec mongodb mongoimport --db myflix --collection videos --drop --file /home/movies.json 
+
+
+    restheart:
+        container_name: restheart
+        image: softinstigate/restheart:latest
+        environment:
+          RHO: >
+              /mclient/connection-string->"mongodb://mongodb";
+              /http-listener/host->"0.0.0.0";
+        links: 
+          - mongodb
+        depends_on:
+          - mongodb
+        ports:
+            - 8080:8080
+
+#  docker run -d -p 80:8080 --name restheart --link mongodb:mongodb softinstigate/restheart
+           
